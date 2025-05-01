@@ -67,99 +67,123 @@ class EmailProcessor:
         }
 
     def classify_email(self, email: Dict) -> Optional[str]:
-        """
-        Classify an email using LLM.
-        Returns the classification category or None if classification fails.
-        """
 
+        """
+        Classify an email using LLM with detailed logging.
+        """
         try:
-        # Prepare the cleaned input
+            # Validate required fields
+            required_fields = ["id", "subject", "body"]
+            for field in required_fields:
+                if field not in email or not email[field]:
+                    logger.error(f"Email is missing required field '{field}': {email}")
+                    return None
             subject = email.get("subject", "")
             body = email.get("body", "")
             email_text = f"Subject: {subject}\nBody: {body}".strip()
 
-            # Build the classification prompt
             prompt = (
-                "You are an AI assistant. "
-                "Classify the following email into one of these categories: "
-                "complaint, inquiry, feedback, support_request, other.\n\n"
-                f"Email content:\n{email_text}\n\n"
-                "Return only the category name."
+                "You are an AI email classifier. Read the email and do the following:\n"
+                "1. Think step-by-step about the issue.\n"
+                "2. Classify the email into one of the following categories:\n"
+                "   complaint, inquiry, feedback, support_request, other\n"
+                "3. Estimate your confidence in the classification on a scale from 1 (very unsure) to 5 (very confident).\n\n"
+                f"Email:\nSubject: {subject}\nBody: {body}\n\n"
+                "Respond in this format:\n"
+                "Category: <one of the five categories>\n"
+                "Confidence: <1-5>"
             )
 
-            # Make the OpenAI API call
+            logger.info(f"Classifying email {email['id']}...")
+            logger.debug(f"Classification prompt:\n{prompt}")
+
             response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0
             )
 
-            # Extract and clean the model response
-            classification = response.choices[0].message.content.strip().lower()
+            raw_output = response.choices[0].message.content.strip()
+            logger.debug(f"Raw classification response:\n{raw_output}")
 
-            # Validate classification
-            if classification in self.valid_categories:
-                logger.info(f"Email {email['id']} classified as '{classification}'.")
-                return classification
-            else:
-                logger.warning(f"Invalid classification for email {email['id']}: {classification}")
+            # Parse category and confidence
+            category = None
+            confidence = 5  # Default to high confidence
+            self.last_confidence = confidence
+
+            for line in raw_output.lower().splitlines():
+                if line.startswith("category:"):
+                    category = line.split("category:")[1].strip()
+                elif line.startswith("confidence:"):
+                    try:
+                        confidence = int(line.split("confidence:")[1].strip())
+                    except ValueError:
+                        confidence = 1  # Default to low confidence on parse failure
+
+            # Fallback logic if confidence is too low or category is invalid
+            if category not in self.valid_categories or confidence < 3:
+                logger.warning(f"Email {email['id']} classified with low confidence ({confidence}/5). Using fallback category 'other'.")
                 return "other"
+
+            logger.info(f"Email {email['id']} classified as '{category}' with confidence {confidence}/5.")
+            return category
+
 
         except Exception as e:
             logger.error(f"Error classifying email {email['id']}: {str(e)}")
             return None
 
-
-
     def generate_response(self, email: Dict, classification: str) -> Optional[str]:
         """
-        Generate an automated response based on email classification using chain-of-thought prompting.
+        Generate a structured response using chain-of-thought reasoning.
         """
         try:
-            # Prepare the cleaned input
+            # Validate required fields
+            required_fields = ["id", "subject", "body"]
+            for field in required_fields:
+                if field not in email or not email[field]:
+                    logger.error(f"Cannot generate response. Missing '{field}' in email: {email}")
+                    return None
             subject = email.get("subject", "")
             body = email.get("body", "")
             email_text = f"Subject: {subject}\nBody: {body}".strip()
 
-            # Build the structured prompt
             prompt = (
-                "You are a helpful AI assistant tasked with drafting a professional email response.\n"
-                "Before writing the reply, reason carefully step-by-step.\n"
-                "If you are unsure about any step (tone, urgency), state 'unsure'.\n\n"
-                "Instructions:\n"
-                "Step 1: Briefly summarize the customer's main issue or request.\n"
-                "Step 2: Identify the email tone (angry, neutral, happy, confused). If unclear, say 'unsure'.\n"
-                "Step 3: Assess urgency (low, medium, high). If unclear, say 'unsure'.\n"
-                "Step 4: Based on the issue, tone, urgency, and the provided category "
-                f"('{classification}'), draft a short, professional, empathetic response.\n\n"
-                "Here is the email:\n"
-                f"{email_text}\n\n"
-                "Format your output EXACTLY like this:\n"
+                "You are a helpful AI assistant drafting a customer service response.\n"
+                "Follow these steps:\n"
+                "1. Summarize the user's issue.\n"
+                "2. Infer their tone (angry, happy, neutral, confused, unsure).\n"
+                "3. Judge urgency (low, medium, high, unsure).\n"
+                "4. Then write a short, professional, empathetic reply.\n\n"
+                f"Email:\n{email_text}\n\n"
+                f"Category: {classification}\n\n"
+                "Respond using this format:\n"
                 "Reasoning:\n"
-                "1. Issue: <summarized issue>\n"
+                "1. Issue: <summary>\n"
                 "2. Tone: <tone>\n"
                 "3. Urgency: <urgency>\n\n"
                 "Drafted Response:\n"
-                "<final email response>"
+                "<response>"
             )
 
-            # Make the OpenAI API call
+            logger.info(f"Generating response for email {email['id']} ({classification})...")
+            logger.debug(f"Response prompt:\n{prompt}")
+
             response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0
+                temperature=0.5
             )
 
-            # Extract and parse the response
-            full_text = response.choices[0].message.content.strip()
+            full_response = response.choices[0].message.content.strip()
+            logger.debug(f"Raw generated response:\n{full_response}")
 
-            # Try to split into Reasoning and Drafted Response
-            if "Drafted Response:" in full_text:
-                drafted_response = full_text.split("Drafted Response:")[1].strip()
-                logger.info(f"Generated response for email {email['id']}.")
-                return drafted_response
+            if "Drafted Response:" in full_response:
+                drafted = full_response.split("Drafted Response:")[1].strip()
+                logger.info(f"Response generated for email {email['id']}.")
+                return drafted
             else:
-                logger.warning(f"Unexpected format in response for email {email['id']}. Full output: {full_text}")
+                logger.warning(f"Unexpected format for email {email['id']}. Full response: {full_response}")
                 return None
 
         except Exception as e:
@@ -223,16 +247,30 @@ class EmailAutomationSystem:
         3. Send or log the response based on the classification.
         4. Return structured results.
         """
-        result = {
-            "email_id": email.get("id", "unknown"),
+        return {
+            "email_id": "unknown",
             "success": False,
             "classification": None,
+            "confidence": None,
             "response_sent": None
         }
 
+
         try:
+            # Validate input structure early
+            if not isinstance(email, dict) or "id" not in email:
+                logger.error("Invalid email format passed to process_email. Skipping...")
+                return {
+                    "email_id": "unknown",
+                    "success": False,
+                    "classification": None,
+                    "response_sent": None
+                }
             # Step 1: Classify
             classification = self.processor.classify_email(email)
+            if hasattr(self.processor, 'last_confidence'):
+                result["confidence"] = self.processor.last_confidence
+
             if not classification:
                 logger.error(f"Failed to classify email {email['id']}.")
                 return result
