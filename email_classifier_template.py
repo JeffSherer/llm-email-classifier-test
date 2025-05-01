@@ -70,24 +70,137 @@ class EmailProcessor:
         """
         Classify an email using LLM.
         Returns the classification category or None if classification fails.
-        
-        TODO: 
-        1. Design and implement the classification prompt
-        2. Make the API call with appropriate error handling
-        3. Validate and return the classification
         """
-        pass
+
+        try:
+        # Prepare the cleaned input
+            subject = email.get("subject", "")
+            body = email.get("body", "")
+            email_text = f"Subject: {subject}\nBody: {body}".strip()
+
+            # Build the classification prompt
+            prompt = (
+                "You are an AI assistant. "
+                "Classify the following email into one of these categories: "
+                "complaint, inquiry, feedback, support_request, other.\n\n"
+                f"Email content:\n{email_text}\n\n"
+                "Return only the category name."
+            )
+
+            # Make the OpenAI API call
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0
+            )
+
+            # Extract and clean the model response
+            classification = response.choices[0].message.content.strip().lower()
+
+            # Validate classification
+            if classification in self.valid_categories:
+                logger.info(f"Email {email['id']} classified as '{classification}'.")
+                return classification
+            else:
+                logger.warning(f"Invalid classification for email {email['id']}: {classification}")
+                return "other"
+
+        except Exception as e:
+            logger.error(f"Error classifying email {email['id']}: {str(e)}")
+            return None
+
+
 
     def generate_response(self, email: Dict, classification: str) -> Optional[str]:
         """
-        Generate an automated response based on email classification.
-        
-        TODO:
-        1. Design the response generation prompt
-        2. Implement appropriate response templates
-        3. Add error handling
+        Generate an automated response based on email classification using chain-of-thought prompting.
         """
-        pass
+        try:
+            # Prepare the cleaned input
+            subject = email.get("subject", "")
+            body = email.get("body", "")
+            email_text = f"Subject: {subject}\nBody: {body}".strip()
+
+            # Build the structured prompt
+            prompt = (
+                "You are a helpful AI assistant tasked with drafting a professional email response.\n"
+                "Before writing the reply, reason carefully step-by-step.\n"
+                "If you are unsure about any step (tone, urgency), state 'unsure'.\n\n"
+                "Instructions:\n"
+                "Step 1: Briefly summarize the customer's main issue or request.\n"
+                "Step 2: Identify the email tone (angry, neutral, happy, confused). If unclear, say 'unsure'.\n"
+                "Step 3: Assess urgency (low, medium, high). If unclear, say 'unsure'.\n"
+                "Step 4: Based on the issue, tone, urgency, and the provided category "
+                f"('{classification}'), draft a short, professional, empathetic response.\n\n"
+                "Here is the email:\n"
+                f"{email_text}\n\n"
+                "Format your output EXACTLY like this:\n"
+                "Reasoning:\n"
+                "1. Issue: <summarized issue>\n"
+                "2. Tone: <tone>\n"
+                "3. Urgency: <urgency>\n\n"
+                "Drafted Response:\n"
+                "<final email response>"
+            )
+
+            # Make the OpenAI API call
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0
+            )
+
+            # Extract and parse the response
+            full_text = response.choices[0].message.content.strip()
+
+            # Try to split into Reasoning and Drafted Response
+            if "Drafted Response:" in full_text:
+                drafted_response = full_text.split("Drafted Response:")[1].strip()
+                logger.info(f"Generated response for email {email['id']}.")
+                return drafted_response
+            else:
+                logger.warning(f"Unexpected format in response for email {email['id']}. Full output: {full_text}")
+                return None
+
+        except Exception as e:
+            logger.error(f"Error generating response for email {email['id']}: {str(e)}")
+            return None
+
+
+
+    def extract_email_parts(self, subject: str, body: str) -> Dict[str, str]:
+        """
+        Very basic placeholder extractor to structure the email information.
+        Can later be upgraded to an LLM call for smarter extraction.
+        """
+        summary = subject if subject else "No subject provided."
+        
+        # Simple rules to infer tone and urgency
+        lower_body = body.lower()
+        tone = "angry" if any(word in lower_body for word in ["angry", "unacceptable", "terrible", "upset", "worst"]) else "neutral"
+        urgency = "urgent" if any(word in lower_body for word in ["urgent", "asap", "immediately", "right away"]) else "normal"
+        
+        # Basic guess about request
+        if "refund" in lower_body:
+            request = "refund request"
+        elif "help" in lower_body or "error" in lower_body:
+            request = "technical support"
+        elif "question" in lower_body or "clarify" in lower_body:
+            request = "product inquiry"
+        elif "thank you" in lower_body or "great" in lower_body:
+            request = "positive feedback"
+        elif "partnership" in lower_body or "collaboration" in lower_body:
+            request = "business opportunity"
+        else:
+            request = "general inquiry"
+        
+        return {
+            "summary": summary,
+            "tone": tone,
+            "request": request,
+            "urgency": urgency
+        }
+
 
 
 class EmailAutomationSystem:
@@ -104,50 +217,76 @@ class EmailAutomationSystem:
 
     def process_email(self, email: Dict) -> Dict:
         """
-        Process a single email through the complete pipeline.
-        Returns a dictionary with the processing results.
-        
-        TODO:
-        1. Implement the complete processing pipeline
-        2. Add appropriate error handling
-        3. Return processing results
+        Process a single email through the complete pipeline:
+        1. Classify the email.
+        2. Generate a response.
+        3. Send or log the response based on the classification.
+        4. Return structured results.
         """
-        pass
+        result = {
+            "email_id": email.get("id", "unknown"),
+            "success": False,
+            "classification": None,
+            "response_sent": None
+        }
+
+        try:
+            # Step 1: Classify
+            classification = self.processor.classify_email(email)
+            if not classification:
+                logger.error(f"Failed to classify email {email['id']}.")
+                return result
+            result["classification"] = classification
+
+            # Step 2: Generate Response
+            response = self.processor.generate_response(email, classification)
+            if not response:
+                logger.error(f"Failed to generate response for email {email['id']}.")
+                return result
+
+            # Step 3: Handle Based on Classification
+            handler = self.response_handlers.get(classification, self._handle_other)
+            handler(email)
+
+            # Log response sending
+            if classification == "complaint":
+                send_complaint_response(email["id"], response)
+            else:
+                send_standard_response(email["id"], response)
+
+            # Mark success
+            result["success"] = True
+            result["response_sent"] = response
+
+        except Exception as e:
+            logger.error(f"Error processing email {email['id']}: {str(e)}")
+        logger.info(f"Successfully processed email {email['id']} as {classification}.")
+
+        return result
 
     def _handle_complaint(self, email: Dict):
-        """
-        Handle complaint emails.
-        TODO: Implement complaint handling logic
-        """
-        pass
+        """Handle complaint emails by creating an urgent ticket."""
+        create_urgent_ticket(email["id"], "complaint", email.get("body", ""))
 
     def _handle_inquiry(self, email: Dict):
-        """
-        Handle inquiry emails.
-        TODO: Implement inquiry handling logic
-        """
-        pass
+        """Handle inquiry emails by logging inquiry."""
+        logger.info(f"Handling inquiry email {email['id']}.")
 
     def _handle_feedback(self, email: Dict):
-        """
-        Handle feedback emails.
-        TODO: Implement feedback handling logic
-        """
-        pass
+        """Handle feedback emails by logging the feedback."""
+        feedback_text = email.get("body", "")
+        log_customer_feedback(email["id"], feedback_text)
 
     def _handle_support_request(self, email: Dict):
-        """
-        Handle support request emails.
-        TODO: Implement support request handling logic
-        """
-        pass
+        """Handle support request emails by creating a support ticket."""
+        context = email.get("body", "")
+        create_support_ticket(email["id"], context)
 
     def _handle_other(self, email: Dict):
-        """
-        Handle other category emails.
-        TODO: Implement handling logic for other categories
-        """
-        pass
+        """Handle other types of emails by logging."""
+        logger.info(f"Handling 'other' type email {email['id']}.")
+
+
 
 # Mock service functions
 def send_complaint_response(email_id: str, response: str):
@@ -203,4 +342,4 @@ def run_demonstration():
 
 # Example usage:
 if __name__ == "__main__":
-    results_df = run_demonstration()
+    run_demonstration()
