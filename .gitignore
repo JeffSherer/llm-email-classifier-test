@@ -1,1 +1,12 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
 .env
+
+# Test output and cache
+.pytest_cache/
+*.log
+
