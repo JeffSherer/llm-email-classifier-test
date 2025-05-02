@@ -9,7 +9,6 @@ import time
 import pandas as pd
 from dotenv import load_dotenv
 from openai import OpenAI
-import openai.error
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -185,9 +184,6 @@ class EmailProcessor:
             # Prepare prompt components
             subject = email.get("subject", "")
             body = email.get("body", "")
-            # Prepare prompt components
-            subject = email.get("subject", "")
-            body = email.get("body", "")
             prompt = (
                 # Define assistant persona and frame task
                 "You are an expert AI assistant trained in customer service. "
@@ -269,7 +265,10 @@ class EmailAutomationSystem:
         }
 
     def process_email(self, email: Dict) -> Dict:
-        # Initialize response structure
+        """
+        Process a single email through classification, response generation, 
+        and appropriate handling (ticketing, logging, response dispatch).
+        """
         result = {
             "email_id": email.get("id", "unknown"),
             "success": False,
@@ -279,80 +278,65 @@ class EmailAutomationSystem:
         }
 
         try:
-            # Input strucutre validation
+            # Validate input
             if not isinstance(email, dict) or "id" not in email:
                 logger.error("Invalid email format passed to process_email. Skipping...")
                 return result
-            
-            # Call classification method
-            classification = self.processor.classify_email(email)
-            if hasattr(self.processor, 'last_confidence'):
-                result["confidence"] = self.processor.last_confidence
 
+            # Step 1: Classify the email
+            classification = self.processor.classify_email(email)
             if not classification:
                 logger.error(f"Failed to classify email {email['id']}.")
                 return result
 
             result["classification"] = classification
-            # Call response generation method
+            if hasattr(self.processor, 'last_confidence'):
+                result["confidence"] = self.processor.last_confidence
+
+            # Step 2: Generate a response
             response = self.processor.generate_response(email, classification)
             if not response:
                 logger.error(f"Failed to generate response for email {email['id']}.")
                 return result
-            # Call assigned category handler
+
+            # Step 3: Route to appropriate handler (handles tickets, logs, and sending)
             handler = self.response_handlers.get(classification, self._handle_other)
-            handler(email)
+            handler(email, response)
 
-            # Service response based on classification
-            if classification == "complaint":
-                send_complaint_response(email["id"], response)
-            elif classification == "inquiry":
-                send_standard_response(email["id"], response)
-            elif classification == "feedback":
-                send_standard_response(email["id"], response)
-            elif classification == "support_request":
-                send_standard_response(email["id"], response)
-            elif classification == "other":
-                send_standard_response(email["id"], response)
-            else:
-                logger.warning(f"Unknown classification '{classification}' for email {email['id']}. Sending standard response as fallback.")
-                send_standard_response(email["id"], response)
-
-            # Tracking the success of the system all working together
             result["success"] = True
             result["response_sent"] = response
 
         except Exception as e:
-            logger.error(f"Error processing email {email['id']}: {str(e)}")
+            logger.error(f"Error processing email {email.get('id', 'unknown')}: {str(e)}")
 
         logger.info(f"Successfully processed email {email['id']} as {classification}.")
         return result
 
 
-    def _handle_complaint(self, email: Dict):
+    def _handle_complaint(self, email: Dict, response: str):
         """Handle complaint emails by creating an urgent ticket."""
         # Create a support ticket for the complaint
         create_urgent_ticket(email["id"], "complaint", email.get("body", ""))
 
-    def _handle_inquiry(self, email: Dict):
+    def _handle_inquiry(self, email: Dict, response: str):
         """Handle inquiry emails by logging inquiry."""
         # Log the inquiry for follow-up
         logger.info(f"Handling inquiry email {email['id']}.")
 
-    def _handle_feedback(self, email: Dict):
+    def _handle_feedback(self, email: Dict, response: str):
         """Handle feedback emails by logging the feedback."""
         # Record the feedback
         feedback_text = email.get("body", "")
         log_customer_feedback(email["id"], feedback_text)
 
-    def _handle_support_request(self, email: Dict):
+    def _handle_support_request(self, email: Dict, response: str):
         """Handle support request emails by creating a support ticket."""
         # Create a support ticket based on the request
         context = email.get("body", "")
         create_support_ticket(email["id"], context)
 
 
-    def _handle_other(self, email: Dict):
+    def _handle_other(self, email: Dict, response: str):
         """Handle other types of emails by logging."""
         # Log uncategorized emails
         logger.info(f"Handling 'other' type email {email['id']}.")
