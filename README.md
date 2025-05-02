@@ -8,8 +8,6 @@ This project implements an automated email classification and response system po
 - **Generates** chain-of-thought based customer service replies  
 - **Automates** responses or support actions based on classification  
 
-The architecture is modular, fault-tolerant, and designed to reflect real-world LLM integration best practices.
-
 ---
 
 ## Setup Instructions
@@ -79,33 +77,31 @@ These components implement the core requirements of the assignment:
   Logs decisions and prints a summary DataFrame with email ID, classification, confidence, and success status.
 
 - **Robust Error Handling**  
-  Catches malformed input, OpenAI errors, and unexpected outputs without crashing the system.
+  Catches malformed input/output, OpenAI errors, and unexpected outputs without crashing the system.
 
 ---
 
 ## Prompt Design Decisions
 
-The system uses **instructional prompting** to drive both classification and response generation. The prompts were optimized with several design goals in mind:
+The system uses instructional prompting to drive both classification and response generation. The prompts were optimized with several design goals in mind:
 
 - **Expert Assistant Framing**  
-  The model is instructed to act as a highly trained customer service representative, which guides tone and reasoning style.
+  Model is instructed to act as a highly trained customer service representative.
 
 - **Explicit Category Definitions**  
-  Categories such as `inquiry`, `feedback`, and `support_request` are framed with real-world meanings to reduce overlap. Definitions are based on common customer service standards to improve model accuracy.
+  Categories such as `inquiry`, `feedback`, and `support_request` are framed with definitions to reduce overlap. Definitions are based on common customer service standards.
 
 - **Reasoning Before Responding**  
   Chain-of-thought style instructions are included to encourage the model to explain its process before providing an output. This supports more stable and interpretable predictions.
 
 - **Confidence Scoring**  
-  The prompt asks the model to self-report confidence (1–5) which is then parsed and used as a fallback safeguard.
+  The prompt asks the model to self-report confidence (1–5) which is then parsed and used as a fallback.
 
 - **Format Reinforcement**  
-  All outputs are constrained to a predictable structure (e.g., `Category:`, `Confidence:`, `Drafted Response:`), making parsing and downstream automation reliable and error-resistant.
+  All outputs are constrained to a predictable structure (e.g., `Category:`, `Confidence:`, `Drafted Response:`), making parsing and downstream automation reliable.
 
 - **Response Prompt Mirrors Real Support Flow**  
-  The reply generation prompt mirrors a real agent's mental model: understand the issue → detect tone → assess urgency → write message. This structure makes generated replies more trustworthy and context-sensitive.
-
-These prompt strategies collectively support accuracy, interpretability, and modular extensibility—key criteria for safe, real-world LLM deployment.
+  The reply generation prompt mirrors a real agent's mental model: understand the issue → detect tone → assess urgency → write message (improves contextual grounding).
 
 ---
 
@@ -146,7 +142,7 @@ pytest tests/test_email_processor.py -v
 
 ### Prompt Iteration
 
-This system evolved through multiple prompt iterations, starting simple and gradually incorporating more structure and safeguards.
+This system evolved through a few prompt iterations, starting simple and then incorporating more structure and safeguards.
 
 **Initial Prompt (v1):**
 - Basic task framing: “Classify this email into one of five categories.”
@@ -159,13 +155,11 @@ This system evolved through multiple prompt iterations, starting simple and grad
 - No way to detect ambiguous or low-confidence outputs
 
 **Final Prompt Improvements:**
-- **Persona Framing:** Assigned the role of a professional customer support assistant to guide tone and intent
-- **Step-by-Step Reasoning:** Introduced a numbered thought process to improve consistency and accuracy
+- **Persona Framing:** Assigned the role of a professional customer support assistant to guide tone
+- **Step-by-Step Reasoning:** Introduced a numbered thought process to improve consistency
 - **Category Definitions:** Added concise industry-aligned definitions for each classification label
 - **Confidence Scoring:** Prompted the model to estimate its confidence on a 1–5 scale to handle uncertain cases programmatically
-- **Structured Output Format:** Defined a fixed response structure (e.g., `Category: ...`, `Confidence: ...`) to support robust parsing
-
-The generation prompt followed a similar progression, ultimately producing output that begins with structured reasoning steps (summary, tone, urgency) followed by a customer-ready reply.
+- **Structured Output Format:** Defined a fixed response structure (e.g., `Category: ...`, `Confidence: ...`) for easy parsing
 
 ---
 
@@ -176,17 +170,15 @@ Key choices made throughout development:
 - **Model Selection:** Used `gpt-3.5-turbo-0125` with `temperature=0` for classification (for determinism) and `0.5` for response generation (for natural tone)
 - **Fallback Logic:** Implemented confidence-based fallback to "other" category when confidence was low or outputs were malformed
 - **Structured Prompting:** Both classification and generation prompts use explicit formatting to reduce variation and simplify parsing
-- **Retry Mechanism:** Wrapped OpenAI API calls with a retry loop to handle rate limits and transient errors
+- **Retry Mechanism:** Wrapped OpenAI API calls with a retry loop to handle rate limits and errors
 - **Inline Logging:** Used Python logging to trace actions without interfering with normal execution
 
 ---
 
 ### Challenges Encountered
 
-- **LLM Output Instability:** Early prompts yielded inconsistent and difficult-to-parse responses
-- **Confidence Handling:** Needed to implement logic for low-confidence cases without adding unnecessary complexity
-- **Prompt Token Budget:** Few-shot examples were tested but excluded due to prompt length concerns and sufficient performance without them
-- **Single-Script Structure:** The provided boilerplate code was flat; refactoring into modules would have improved readability and testing
+- **Confidence Handling:** Had to implement logic for low-confidence cases without adding unnecessary complexity
+- **Prompt Token Budget:** Few-shot examples were tested but excluded due to prompt length concerns (context window) and sufficient performance without them
 
 ---
 
@@ -205,8 +197,8 @@ Key choices made throughout development:
 
 ### Production Considerations
 
-- Manage secrets via environment variables for secure deployment.
-- Structure prompts and outputs for easy integration with CRMs or helpdesk tools.
+- Manage secrets (API keys) via environment variables for secure deployment.
+- Structure prompts and outputs for easy integration.
 - Use modular code design to support future refactoring into services or APIs.
 - Handle errors and low-confidence outputs gracefully to ensure reliability.
 - Mock LLMs in tests to enable CI without needing API access.
