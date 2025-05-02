@@ -2,183 +2,145 @@
 
 ## Overview
 
-This project demonstrates a system that uses a Large Language Model (LLM) to:
-- **Classify** incoming emails into structured categories
-- **Generate** chain-of-thought structured replies based on email content
-- **Automate** responses or actions depending on classification
+This project implements an automated email classification and response system powered by OpenAI’s `gpt-3.5-turbo-0125`. It:
 
-The system follows a modular design using OpenAI's `gpt-3.5-turbo` API, with clean error handling, structured prompting, and logging.
+- **Classifies** emails into predefined categories  
+- **Generates** chain-of-thought based customer service replies  
+- **Automates** responses or support actions based on classification  
+
+The architecture is modular, fault-tolerant, and designed to reflect real-world LLM integration best practices.
 
 ---
 
 ## Setup Instructions
 
-1. **Clone the repository**
-
 ```bash
+# Clone the repo
 git clone https://github.com/JeffSherer/llm-email-classifier-test.git
 cd llm-email-classifier-test
-```
 
-2. **Create and activate a virtual environment**
-
-```bash
+# Create and activate a virtual environment
 conda create -n cadre-ai python=3.10
 conda activate cadre-ai
-```
 
-3. **Install dependencies**
-
-```bash
+# Install dependencies
 pip install -r requirements.txt
+
+# Add your OpenAI key
+echo "OPENAI_API_KEY=your_key_here" > .env
 ```
-
-4. **Create a `.env` file in the root directory**
-
-```bash
-OPENAI_API_KEY=your_openai_api_key_here
-```
-
-*Note: Make sure your API key has the correct permissions.*
 
 ---
 
 ## Project Structure
 
-| File | Description |
-|:---|:---|
-| `email_classifier_template.py` | Main script containing email processor, automation system, and demonstration runner |
-| `.env` | Contains your OpenAI API key (not tracked by version control) |
-| `requirements.txt` | File listing required Python packages |
-| `README.md` | This documentation |
-
----
-
-## System Architecture
-
-| Component | Purpose |
-|:---|:---|
-| `EmailProcessor` | Classifies emails and generates responses with Chain of Thought prompting |
-| `EmailAutomationSystem` | Full pipeline for processing, handling, and logging email interactions |
-| Mock functions | Simulate sending email responses, creating support tickets, logging feedback |
-
----
-
-## Key Features
-
-- **Email Classification** using structured prompts and step-by-step reasoning
-- **Automated Response Generation** with structured logic
-- **Mock Integrations** for ticket creation and feedback logging
-- **Chain-of-Thought Prompting** improves LLM reliability
-- **Extensive Logging** for all classification and generation steps
-- **Graceful Error Handling** for all parts of the pipeline
-
----
-
-## Categories Used
-- `complaint`
-- `inquiry`
-- `feedback`
-- `support_request`
-- `other`
+| File/Folder              | Description                                                |
+|--------------------------|------------------------------------------------------------|
+| `email_classifier_template.py` | Main system logic (classification, response, automation)     |
+| `tests/`                 | Test suite using `pytest` and `monkeypatch`                |
+| `.env`                   | API key storage (excluded from version control)            |
+| `requirements.txt`       | Python dependencies                                        |
 
 ---
 
 ## How It Works
 
-1. Emails are loaded from a sample list.
-2. Each email is processed:
-   - Classified with the LLM
-   - Reasoned over to extract tone, urgency, and draft a reply
-   - Mock services simulate sending responses or logging actions
-3. A final summary is printed using a pandas DataFrame.
+Each email is passed through the following steps:
+
+1. **Classification** using LLM and a structured prompt  
+2. **Confidence score** (1–5) is parsed from the output  
+3. If confidence is too low or category is invalid, fallback to `"other"`  
+4. **Structured response** is generated using reasoning format  
+5. **Routing** triggers a mock action (e.g., create ticket, send response)  
+6. Results are stored and summarized with `pandas`  
 
 ---
 
-## To Run the Demonstration
+## Key Features
+
+These components implement the core requirements of the assignment:
+
+- **Email Validation**  
+  Ensures each email has required fields (`id`, `subject`, `body`) before processing.
+
+- **LLM Classification via Prompting**  
+  Uses OpenAI's `gpt-3.5-turbo-0125` with a structured prompt to classify emails into one of five categories.  
+  This model was selected for its reliable latency and cost-performance balance, sufficient for the classification and reasoning tasks.
+
+- **Confidence-Based Safeguard**  
+  Parses model’s self-reported confidence (1–5). Falls back to `"other"` if score is low or output is malformed.
+
+- **Chain-of-Thought Response Generation**  
+  Generates helpful, empathetic replies by reasoning through issue summary, tone, and urgency before drafting the message.
+
+- **Pipeline Automation**  
+  Full flow: classification → response → routed action. Each component is modular and testable.
+
+- **Logging and Summary Output**  
+  Logs decisions and prints a summary DataFrame with email ID, classification, confidence, and success status.
+
+- **Robust Error Handling**  
+  Catches malformed input, OpenAI errors, and unexpected outputs without crashing the system.
+
+---
+
+## Run the Demo
 
 ```bash
 python email_classifier_template.py
 ```
 
-You will see:
-- Logging output in your terminal
-- A printed summary of email processing results
-
----
-
-## Development Log and Fixes
-
-### Prompt Engineering
-- Iterated on classification prompt to include step-by-step thinking
-- Switched to a more structured reasoning format for response generation
-- All prompts now explicitly separate reasoning from the final output
-
-### Environment Errors
-- Initially encountered NumPy compatibility issues
-- Fixed by recreating the environment with pinned versions
-- Confirmed compatibility by running on clean machines
-
-### Code Structure
-- All logic kept in a single file for simplicity
-- Separation of concerns respected (processing vs. automation)
-- Logging and validation added to support debugging and testing
-
----
-
-## Evaluation Criteria Coverage
-
-| Criterion | Addressed |
-|----------|-----------|
-| Code Quality | ✅ Modular, documented, validated |
-| LLM Integration | ✅ Clean API handling, prompt tuning |
-| Prompt Engineering | ✅ Iterative refinement, reasoning chain |
-| System Design | ✅ Logging, extensibility, fail-safe guards |
+You’ll see terminal logs and a pandas summary table showing:
+- Email ID
+- Classification
+- Confidence score
+- Response text
+- Success status
 
 ---
 
 ## Testing
 
-You can run basic manual tests using the provided `sample_emails` list.
-Automated tests (e.g., using `pytest`) can be added in a `tests/` directory.
+Tests are written with `pytest` and include:
 
-Sample test case outline:
+- Valid classification and response generation  
+- Handling of missing fields  
+- Handling malformed or invalid LLM responses  
+- Low-confidence fallback  
+- Full pipeline integration  
 
-```python
-# tests/test_classification.py
-import pytest
-from email_classifier_template import EmailProcessor
+Run tests with:
 
-@pytest.fixture
-def processor():
-    return EmailProcessor()
-
-def test_complaint_classification(processor):
-    email = {
-        "id": "test-001",
-        "subject": "Product broken",
-        "body": "I received a damaged item. This is unacceptable. I want a refund."
-    }
-    result = processor.classify_email(email)
-    assert result == "complaint"
+```bash
+pytest tests/test_email_processor.py -v
 ```
 
 ---
 
-## Final Notes
+## Design Additions
 
-- The system can be extended easily with real email APIs
-- Logging provides visibility during execution and failure points
-- Designed with production patterns but scoped for evaluation
+These enhancements improve performance, reliability, and testability beyond the base assignment:
+
+### Retry Logic for OpenAI API Calls  
+Retries once on `RateLimitError`, `APIError`, or `OpenAIError` to avoid transient failure.
+
+### Confidence Scoring and Fallback  
+Extracts a 1–5 confidence rating from the LLM. Falls back to `"other"` on low confidence or invalid category to protect response quality.
+
+### Structured Prompting  
+Uses explicit, step-by-step prompting for both classification and generation. Improves model reliability and simplifies downstream parsing.
+
+### Mocked LLM in Tests  
+Mocks LLM responses using `monkeypatch` to test classification, generation, and failure scenarios without hitting the API.
+
+### Integrated Logging  
+Logs key flow events including classification results, retry attempts, errors, and response generation for full traceability.
+
+### End-to-End Integration Tests  
+Verifies full flow from email input to final action handling to ensure component coordination.
 
 ---
 
 ## Author
+
 Jeffrey Sherer
-
----
-
-## License
-MIT (add `LICENSE` file if needed)
-
----
