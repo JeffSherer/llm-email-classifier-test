@@ -201,18 +201,21 @@ Key choices made throughout development:
 
 ---
 
+---
+
 ### Production Considerations
 
-While designed for demonstration, the implementation accounts for real-world concerns:
-
-- **Environment-based secrets management** for safe and flexible deployment
-- **Error tolerance and graceful degradation** when faced with malformed inputs or LLM failures
-- **Structured output for downstream integration** with ticketing systems, dashboards, or monitoring tools
-- **Modular class design** for easy expansion to new categories or business logic
-
-This setup could be extended into a production-ready customer support assistant with relatively minimal effort.
-
-
+- Manage secrets via environment variables for secure deployment.
+- Structure prompts and outputs for easy integration with CRMs or helpdesk tools.
+- Use modular code design to support future refactoring into services or APIs.
+- Handle errors and low-confidence outputs gracefully to ensure reliability.
+- Mock LLMs in tests to enable CI without needing API access.
+- Use Git with feature branches and semantic versioning for structured releases.
+- Maintain a changelog and test updates alongside prompt or logic changes.
+- Containerize for deployment (e.g., Docker) and prepare for REST or webhook endpoints.
+- Track confidence scores, fallback usage, and failure types for model tuning.
+- Plan for user-level customization of prompts or reply style in future versions.
+```
 ---
 
 ## Author
