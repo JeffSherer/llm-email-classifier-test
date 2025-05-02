@@ -38,7 +38,6 @@ echo "OPENAI_API_KEY=your_key_here" > .env
 |--------------------------|------------------------------------------------------------|
 | `email_classifier_template.py` | Main system logic (classification, response, automation)     |
 | `tests/`                 | Test suite using `pytest` and `monkeypatch`                |
-| `.env`                   | API key storage (excluded from version control)            |
 | `requirements.txt`       | Python dependencies                                        |
 
 ---
@@ -81,6 +80,32 @@ These components implement the core requirements of the assignment:
 
 - **Robust Error Handling**  
   Catches malformed input, OpenAI errors, and unexpected outputs without crashing the system.
+
+---
+
+## Prompt Design Decisions
+
+The system uses **instructional prompting** to drive both classification and response generation. The prompts were optimized with several design goals in mind:
+
+- **Expert Assistant Framing**  
+  The model is instructed to act as a highly trained customer service representative, which guides tone and reasoning style.
+
+- **Explicit Category Definitions**  
+  Categories such as `inquiry`, `feedback`, and `support_request` are framed with real-world meanings to reduce overlap. Definitions are based on common customer service standards to improve model accuracy.
+
+- **Reasoning Before Responding**  
+  Chain-of-thought style instructions are included to encourage the model to explain its process before providing an output. This supports more stable and interpretable predictions.
+
+- **Confidence Scoring**  
+  The prompt asks the model to self-report confidence (1–5) which is then parsed and used as a fallback safeguard.
+
+- **Format Reinforcement**  
+  All outputs are constrained to a predictable structure (e.g., `Category:`, `Confidence:`, `Drafted Response:`), making parsing and downstream automation reliable and error-resistant.
+
+- **Response Prompt Mirrors Real Support Flow**  
+  The reply generation prompt mirrors a real agent's mental model: understand the issue → detect tone → assess urgency → write message. This structure makes generated replies more trustworthy and context-sensitive.
+
+These prompt strategies collectively support accuracy, interpretability, and modular extensibility—key criteria for safe, real-world LLM deployment.
 
 ---
 

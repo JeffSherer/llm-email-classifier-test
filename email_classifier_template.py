@@ -88,11 +88,16 @@ class EmailProcessor:
             body = email.get("body", "")
             prompt = (
                 # Define assistant persona and frame task
-                "You are an AI email classifier. Read the email and do the following:\n"
+                "You are a highly trained expert customer support assistant. "
+                "Your job is to classify customer emails accurately using reasoning and clear formatting.\n\n"
                 # Chain-of-thought for reasoning
-                "1. Think step-by-step about the issue.\n"
-                "2. Classify the email into one of the following categories:\n"
-                "   complaint, inquiry, feedback, support_request, other\n"
+                "1. Carefully analyze the email content step by step.\n"
+                "2. Classify the email into one of the following categories based on its intent:\n"
+                "   - complaint: A customer expressing dissatisfaction or demanding a resolution.\n"
+                "   - inquiry: A question or request for clarification or product info.\n"
+                "   - feedback: A general comment or praise with no requested action.\n"
+                "   - support_request: A help request related to using a product or service.\n"
+                "   - other: Anything that doesn't clearly match the above.\n"
                 # Self-evaluated confidence measure
                 "3. Estimate your confidence in the classification on a scale from 1 (very unsure) to 5 (very confident).\n\n"
                 # Include email content
@@ -180,16 +185,20 @@ class EmailProcessor:
             # Prepare prompt components
             subject = email.get("subject", "")
             body = email.get("body", "")
+            # Prepare prompt components
+            subject = email.get("subject", "")
+            body = email.get("body", "")
             prompt = (
                 # Define assistant persona and frame task
-                "You are a helpful AI assistant drafting a customer service response.\n"
+                "You are an expert AI assistant trained in customer service. "
+                "You will generate a structured response using reasoning steps and a clear, empathetic tone.\n"
                 # Chain-of-thought structure
                 "Follow these steps:\n"
                 "1. Summarize the user's issue.\n"
                 "2. Infer their tone (angry, happy, neutral, confused, unsure).\n"
                 "3. Judge urgency (low, medium, high, unsure).\n"
                 "4. Then write a short, professional, empathetic reply.\n\n"
-                 # Include email content and classification context
+                # Include email content and classification context
                 f"Email:\nSubject: {subject}\nBody: {body}\n\n"
                 f"Category: {classification}\n\n"
                 # Expected output format
@@ -201,7 +210,6 @@ class EmailProcessor:
                 "Drafted Response:\n"
                 "<response>"
             )
-
             logger.info(f"Generating response for email {email['id']} ({classification})...")
 
             # OpenAI API call with retry logic to generate structured response
