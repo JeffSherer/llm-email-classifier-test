@@ -142,27 +142,76 @@ pytest tests/test_email_processor.py -v
 
 ---
 
-## Design Additions
+## Prompt Iteration and Design Reflection
 
-These enhancements improve performance, reliability, and testability beyond the base assignment:
+### Prompt Iteration
 
-### Retry Logic for OpenAI API Calls  
-Retries once on `RateLimitError`, `APIError`, or `OpenAIError` to avoid transient failure.
+This system evolved through multiple prompt iterations, starting simple and gradually incorporating more structure and safeguards.
 
-### Confidence Scoring and Fallback  
-Extracts a 1–5 confidence rating from the LLM. Falls back to `"other"` on low confidence or invalid category to protect response quality.
+**Initial Prompt (v1):**
+- Basic task framing: “Classify this email into one of five categories.”
+- No assistant persona or output formatting
+- No reasoning steps or confidence scoring
 
-### Structured Prompting  
-Uses explicit, step-by-step prompting for both classification and generation. Improves model reliability and simplifies downstream parsing.
+**Problems Encountered:**
+- Inconsistent output format made parsing unreliable
+- Missing or incorrect category labels
+- No way to detect ambiguous or low-confidence outputs
 
-### Mocked LLM in Tests  
-Mocks LLM responses using `monkeypatch` to test classification, generation, and failure scenarios without hitting the API.
+**Final Prompt Improvements:**
+- **Persona Framing:** Assigned the role of a professional customer support assistant to guide tone and intent
+- **Step-by-Step Reasoning:** Introduced a numbered thought process to improve consistency and accuracy
+- **Category Definitions:** Added concise industry-aligned definitions for each classification label
+- **Confidence Scoring:** Prompted the model to estimate its confidence on a 1–5 scale to handle uncertain cases programmatically
+- **Structured Output Format:** Defined a fixed response structure (e.g., `Category: ...`, `Confidence: ...`) to support robust parsing
 
-### Integrated Logging  
-Logs key flow events including classification results, retry attempts, errors, and response generation for full traceability.
+The generation prompt followed a similar progression, ultimately producing output that begins with structured reasoning steps (summary, tone, urgency) followed by a customer-ready reply.
 
-### End-to-End Integration Tests  
-Verifies full flow from email input to final action handling to ensure component coordination.
+---
+
+### Design Decisions
+
+Key choices made throughout development:
+
+- **Model Selection:** Used `gpt-3.5-turbo-0125` with `temperature=0` for classification (for determinism) and `0.5` for response generation (for natural tone)
+- **Fallback Logic:** Implemented confidence-based fallback to "other" category when confidence was low or outputs were malformed
+- **Structured Prompting:** Both classification and generation prompts use explicit formatting to reduce variation and simplify parsing
+- **Retry Mechanism:** Wrapped OpenAI API calls with a retry loop to handle rate limits and transient errors
+- **Inline Logging:** Used Python logging to trace actions without interfering with normal execution
+
+---
+
+### Challenges Encountered
+
+- **LLM Output Instability:** Early prompts yielded inconsistent and difficult-to-parse responses
+- **Confidence Handling:** Needed to implement logic for low-confidence cases without adding unnecessary complexity
+- **Prompt Token Budget:** Few-shot examples were tested but excluded due to prompt length concerns and sufficient performance without them
+- **Single-Script Structure:** The provided boilerplate code was flat; refactoring into modules would have improved readability and testing
+
+---
+
+### Potential Improvements
+
+- **Modularization:** Split logic into distinct modules (e.g., `config.py`, `data.py`, `prompting.py`, `handlers.py`, `demo.py`)
+- **User-Tailored Prompts:** Adapt generation behavior based on prior user history, tone preference, or brand voice
+- **Real Email Integration:** Connect to actual inboxes using IMAP/SMTP for live classification and response
+- **Category-Specific Prompts:** Tailor prompts for each category (e.g., apologies for complaints, gratitude for feedback)
+- **Extended Observability:** Add latency tracking, confidence trend logging, and response quality checks
+- **Production Deployment:** Containerize the service, add schema validation, integrate with CI/CD and MLOps workflows
+
+---
+
+### Production Considerations
+
+While designed for demonstration, the implementation accounts for real-world concerns:
+
+- **Environment-based secrets management** for safe and flexible deployment
+- **Error tolerance and graceful degradation** when faced with malformed inputs or LLM failures
+- **Structured output for downstream integration** with ticketing systems, dashboards, or monitoring tools
+- **Modular class design** for easy expansion to new categories or business logic
+
+This setup could be extended into a production-ready customer support assistant with relatively minimal effort.
+
 
 ---
 

@@ -318,7 +318,7 @@ class EmailAutomationSystem:
                 logger.warning(f"Unknown classification '{classification}' for email {email['id']}. Sending standard response as fallback.")
                 send_standard_response(email["id"], response)
 
-
+            # Tracking the success of the system all working together
             result["success"] = True
             result["response_sent"] = response
 
