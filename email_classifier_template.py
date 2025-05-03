@@ -392,13 +392,13 @@ def run_demonstration():
     print("\nProcessing Summary:")
     print(df[["email_id", "success", "classification", "response_sent"]])
 
-    print("\n=== ✅ DEMO COMPLETED SUCCESSFULLY ===")
+    print("\n=== DEMO COMPLETED SUCCESSFULLY ===")
     print("Summary of processed emails:\n")
     print(df[["email_id", "success", "classification", "confidence"]].to_string(index=False))
     print("\nGenerated responses (preview):\n")
     for idx, row in df.iterrows():
-        print(f"📨 Email {row['email_id']} → {row['classification']}")
-        print(f"✉️  Response:\n{row['response_sent'][:200]}...\n")  # Truncate for readability
+        print(f" Email {row['email_id']} → {row['classification']}")
+        print(f" Response:\n{row['response_sent'][:200]}...\n")  # Truncate for readability
 
     return df
 
