@@ -190,7 +190,7 @@ Key choices made throughout development:
 - **Category-Specific Prompts:** Tailor prompts for each category (e.g., apologies for complaints, gratitude for feedback)
 - **Extended Observability:** Add latency tracking, confidence trend logging, and response quality checks
 - **Production Deployment:** Containerize the service, add schema validation, integrate with CI/CD and MLOps workflows
-
+- **RAG: Add a database of refined category definitions and sample reaponses to focus the outout of the LLM
 ---
 
 ---
