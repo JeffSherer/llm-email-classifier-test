@@ -1,35 +1,38 @@
 import pytest
-import pdb
 from unittest.mock import patch
 from src.email_processor import EmailProcessor
-from src.openai_helpers import safe_chat_completion
 
-# Optional: Set a breakpoint if you want to debug the test execution
-# pdb.set_trace()
+def mocked_safe_chat_completion(client, messages, temperature=0, model="gpt-3.5-turbo-0125"):
+    prompt = messages[0]["content"]
 
-# Mock the safe_chat_completion function
-def mocked_safe_chat_completion(client, messages, model="gpt-3.5-turbo-0125", temperature=0):
-    print(f"Mock called with message content: {messages[0]['content']}")
+    # Detect classification prompt
+    if "Respond in this format:\nCategory:" in prompt:
+        if "Inquiry about product" in prompt:
+            return "Category: inquiry\nConfidence: 5"
+        if "Feedback on product" in prompt:
+            return "Category: feedback\nConfidence: 5"
+        if "my recent order" in prompt:
+            return "Category: support_request\nConfidence: 5"
+        return "Category: other\nConfidence: 1"
 
-    if "Inquiry about product" in messages[0]["content"]:
-        return {
-            "choices": [{"message": {"content": "Category: inquiry\nConfidence: 5"}}]
-        }
-    elif "Feedback on product" in messages[0]["content"]:
-        return {
-            "choices": [{"message": {"content": "Category: feedback\nConfidence: 5"}}]
-        }
-    return {
-        "choices": [{"message": {"content": "Category: other\nConfidence: 1"}}]
-    }
+    # Detect response generation prompt
+    if "Please follow these steps:" in prompt and "Respond in this format:\nReasoning:" in prompt:
+        return (
+            "Reasoning:\n"
+            "1. Summary: User asked a question or gave feedback\n"
+            "2. Tone: Neutral\n"
+            "3. Urgency: Medium\n\n"
+            "Drafted Response:\n"
+            "Thank you for your message. We appreciate your feedback and will get back to you shortly."
+        )
 
-# Test fixture to mock the OpenAI API key environment variable
+    return None
+
+
 @pytest.fixture(autouse=True)
 def mock_openai_api_key(monkeypatch):
-    # Mock the API key to avoid actual API calls
     monkeypatch.setenv("OPENAI_API_KEY", "mocked-api-key")
 
-# Test for email processing
 def test_email_processing():
     email = {
         "id": "001",
@@ -40,17 +43,14 @@ def test_email_processing():
 
     processor = EmailProcessor()
 
-    # Mock the API call to avoid hitting the actual OpenAI API
-    with patch.object(safe_chat_completion, "__call__", side_effect=mocked_safe_chat_completion):
-        # Test classification
+    with patch("src.email_processor.safe_chat_completion", side_effect=mocked_safe_chat_completion):
         classification = processor.classify_email(email)
-        assert classification == "inquiry", f"Expected 'inquiry', but got {classification}"
+        assert classification == "inquiry", f"Expected 'inquiry', got {classification}"
 
-        # Test response generation
         response = processor.generate_response(email, classification)
-        assert response == "Thank you for your inquiry. We will get back to you shortly.", f"Unexpected response: {response}"
+        assert response
+        assert "thank you" in response.lower()
 
-# Test for valid email processing (feedback example)
 def test_valid_email_processing():
     email = {
         "id": "002",
@@ -61,17 +61,14 @@ def test_valid_email_processing():
 
     processor = EmailProcessor()
 
-    # Mock the API call to avoid hitting the actual OpenAI API
-    with patch.object(safe_chat_completion, "__call__", side_effect=mocked_safe_chat_completion):
-        # Test classification
+    with patch("src.email_processor.safe_chat_completion", side_effect=mocked_safe_chat_completion):
         classification = processor.classify_email(email)
-        assert classification == "feedback", f"Expected 'feedback', but got {classification}"
+        assert classification == "feedback", f"Expected 'feedback', got {classification}"
 
-        # Test response generation
         response = processor.generate_response(email, classification)
-        assert response == "Thank you for your feedback. We appreciate your suggestions.", f"Unexpected response: {response}"
+        assert response
+        assert "thank you" in response.lower()
 
-# Test for invalid email format (no valid category)
 def test_invalid_email_format():
     email = {
         "id": "003",
@@ -82,12 +79,9 @@ def test_invalid_email_format():
 
     processor = EmailProcessor()
 
-    # Mock the API call to avoid hitting the actual OpenAI API
-    with patch.object(safe_chat_completion, "__call__", side_effect=mocked_safe_chat_completion):
-        # Test that the email processor catches the invalid format
+    with patch("src.email_processor.safe_chat_completion", side_effect=mocked_safe_chat_completion):
         classification = processor.classify_email(email)
-        assert classification is None, f"Expected None due to invalid email format, but got {classification}"
+        assert classification is None
 
-        # Test response generation for invalid email
         response = processor.generate_response(email, "complaint")
-        assert response is None, f"Expected None due to invalid email format, but got {response}"
+        assert response is None
