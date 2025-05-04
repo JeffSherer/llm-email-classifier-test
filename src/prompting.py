@@ -15,16 +15,23 @@ def build_classification_prompt(subject: str, body: str) -> str:
     )
 
 
-def build_response_prompt(subject: str, body: str, category: str, sender: str) -> str:
+def build_response_prompt(subject: str, body: str, category: str, sender: str, history=None) -> str:
     guidance = SAMPLE_RESPONSES.get(category, "")
     tone_hint = (
         f"Note: This user ({sender}) may have prior interactions or a specific tone preference. "
         "Adjust tone accordingly while keeping the response clear and professional."
     )
 
+    history_section = ""
+    if history:
+        history_snippets = "\n".join(
+            [f"- Subject: {h['subject']}\n  Body: {h['body']}" for h in history]
+        )
+        history_section = f"\n\nRecent Email History:\n{history_snippets}"
+
     return (
         "You are a professional customer service assistant generating responses to user emails.\n\n"
-        f"Category: {category}\nGuidance: {guidance}\n{tone_hint}\n\n"
+        f"Category: {category}\nGuidance: {guidance}\n{tone_hint}{history_section}\n\n"
         "Please follow these steps:\n"
         "1. Summarize the issue.\n"
         "2. Infer the tone (angry, happy, confused, etc).\n"

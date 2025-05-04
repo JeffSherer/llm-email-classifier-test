@@ -1,11 +1,12 @@
 import os
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from openai import OpenAI
 
 from src.openai_helpers import safe_chat_completion
 from src.validation import validate_email_data
 from src.prompting import build_classification_prompt, build_response_prompt
+from src.email_history import fetch_history, append_to_history  # ✅ NEW
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -66,8 +67,14 @@ class EmailProcessor:
             print(f"[ERROR] Invalid email data: {email}")
             return None
 
+        history = fetch_history(email_obj.from_)  # ✅ fetch previous interactions
+
         prompt = build_response_prompt(
-            email_obj.subject, email_obj.body, classification, email_obj.from_
+            email_obj.subject,
+            email_obj.body,
+            classification,
+            email_obj.from_,
+            history=history,
         )
         print(f"\n📤 [RESPOND] Prompt:\n{prompt[:300]}...")
 
@@ -80,10 +87,19 @@ class EmailProcessor:
 
         print(f"📥 [RESPOND] Raw Response:\n{response[:300]}...\n")
 
+        final_response = None
         if "Drafted Response:" in response:
-            return response.split("Drafted Response:")[1].strip()
+            final_response = response.split("Drafted Response:")[1].strip()
         elif "Response:" in response:
-            return response.split("Response:")[1].strip()
+            final_response = response.split("Response:")[1].strip()
 
-        print(f"[WARN] Unexpected response format:\n{response}")
-        return None
+        if final_response:
+            append_to_history(
+                email_obj.from_,
+                email_obj.subject,
+                email_obj.body,
+                classification,
+                final_response
+            )  # ✅ save it to history
+
+        return final_response
