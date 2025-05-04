@@ -2,6 +2,8 @@ import os
 import logging
 from typing import Dict, Optional, List
 from openai import OpenAI
+from dotenv import load_dotenv
+load_dotenv()
 
 from src.openai_helpers import safe_chat_completion
 from src.validation import validate_email_data
@@ -61,7 +63,7 @@ class EmailProcessor:
         print(f"[SUCCESS] Email classified as '{category}' with confidence {confidence}/5")
         return category
 
-    def generate_response(self, email: Dict, classification: str) -> Optional[str]:
+    def generate_response(self, email: Dict, classification: str, history: Optional[List[Dict]] = None) -> Optional[str]:
         email_obj = validate_email_data(email)
         if not email_obj:
             print(f"[ERROR] Invalid email data: {email}")
