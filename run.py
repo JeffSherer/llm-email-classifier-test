@@ -36,6 +36,7 @@ def main():
         print(response)
     else:
         print("[FAIL] Response generation failed.")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

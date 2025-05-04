@@ -1,5 +1,3 @@
-# src/data.py
-
 from typing import Dict
 
 # Category definitions to anchor RAG-style prompting
@@ -19,4 +17,3 @@ SAMPLE_RESPONSES: Dict[str, str] = {
     "support_request": "Thank you for reporting this. We're looking into your issue and will respond with a solution as soon as possible.",
     "other": "Thank you for reaching out. We'll review your message and respond accordingly.",
 }
-

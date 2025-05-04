@@ -15,8 +15,19 @@ def run_demonstration():
 
     results = []
     for email in sample_emails:
-        logger.info(f"\nProcessing email {email['id']}...")
-        result = automation_system.process_email(email)
+        try:
+            logger.info(f"\nProcessing email {email['id']}...")
+            result = automation_system.process_email(email)
+        except Exception as e:
+            logger.error(f"Failed to process email {email['id']}: {e}")
+            result = {
+                "email_id": email.get("id", "unknown"),
+                "success": False,
+                "classification": None,
+                "confidence": None,
+                "response_sent": "",
+                "error": str(e)
+            }
         results.append(result)
 
     df = pd.DataFrame(results)

@@ -1,6 +1,7 @@
+# src/demo_email_run.py
+
 from src.email_processor import EmailProcessor
 
-# Create sample email
 email = {
     "id": "demo001",
     "subject": "Question about pricing plans",
@@ -9,7 +10,6 @@ email = {
 }
 
 processor = EmailProcessor()
-
 classification = processor.classify_email(email)
 response = processor.generate_response(email, classification)
 

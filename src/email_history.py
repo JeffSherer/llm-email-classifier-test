@@ -22,8 +22,11 @@ def append_to_history(email: str, subject: str, body: str, classification: str, 
     history = []
 
     if os.path.exists(path):
-        with open(path, "r") as f:
-            history = json.load(f)
+        try:
+            with open(path, "r") as f:
+                history = json.load(f)
+        except json.JSONDecodeError:
+            history = []
 
     history.append(entry)
 
@@ -35,7 +38,9 @@ def fetch_history(email: str, limit: int = 3):
     if not os.path.exists(path):
         return []
 
-    with open(path, "r") as f:
-        history = json.load(f)
-
-    return history[-limit:]
+    try:
+        with open(path, "r") as f:
+            history = json.load(f)
+        return history[-limit:]
+    except json.JSONDecodeError:
+        return []
