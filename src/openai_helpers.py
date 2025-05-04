@@ -5,7 +5,7 @@ import os
 
 logger = logging.getLogger(__name__)
 
-COST_PER_1K_TOKENS = 0.0015  # Adjust based on current pricing
+COST_PER_1K_TOKENS = 0.0015 
 COST_LOG_PATH = "logs/costs.log"
 os.makedirs(os.path.dirname(COST_LOG_PATH), exist_ok=True)
 
