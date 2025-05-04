@@ -141,6 +141,19 @@ Verifies full flow from email input to final action handling to ensure component
 
 ---
 
+## Note
+
+You're viewing the `main` branch. A more advanced version is available on the `improvements-final` branch (tagged `v2.0.0`), featuring:
+
+- LangChain integration  
+- CLI and Docker support  
+- Email history tracking  
+
+Further improvements are ongoing in that branch.  
+The original technical test submission is on `feat/email-classifier-submission` (tagged `submitted-version`).
+
+---
+
 ## Author
 
 Jeffrey Sherer
