@@ -211,7 +211,7 @@ Key choices made throughout development:
 
 ## Recent Improvements
 
-Since the initial version on the main branch, the following improvements have been made to enhance the system's functionality and structure 'restrucutre-project-strucutre' has the latest changes:
+Since the initial version on the main branch, the following improvements have been made to enhance the system's functionality and structure `restrucutre-project-strucutre` has the latest changes:
 
 - **Project Restructure:**
   - The project structure has been modularized, with separate directories and files for configuration, email processing, history tracking, utilities, and more. This makes the codebase easier to maintain and extend.
