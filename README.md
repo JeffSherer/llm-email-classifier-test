@@ -178,7 +178,7 @@ Key choices made throughout development:
 ### Challenges Encountered
 
 - **Confidence Handling:** Had to implement logic for low-confidence cases without adding unnecessary complexity
-- **Prompt Token Budget:** Few-shot examples were tested but excluded due to prompt length concerns (context window) and sufficient performance without them
+- **Prompt Token Budget:** Few-shot examples were tested but excluded due to prompt length concerns (context window) and sufficient performance without them.
 
 ---
 
@@ -190,7 +190,7 @@ Key choices made throughout development:
 - **Category-Specific Prompts:** Tailor prompts for each category (e.g., apologies for complaints, gratitude for feedback)
 - **Extended Observability:** Add latency tracking, confidence trend logging, and response quality checks
 - **Production Deployment:** Containerize the service, add schema validation, integrate with CI/CD and MLOps workflows
-- **RAG: Add a database of refined category definitions and sample reaponses to focus the outout of the LLM
+- **RAG:** Add a database of refined category definitions and sample reaponses to focus the outout of the LLM
 ---
 
 ---
@@ -206,13 +206,12 @@ Key choices made throughout development:
 - Maintain a changelog and test updates alongside prompt or logic changes.
 - Containerize for deployment (e.g., Docker) and prepare for REST or webhook endpoints.
 - Track confidence scores, fallback usage, and failure types for model tuning.
-- Plan for user-level customization of prompts or reply style in future versions.
 
 ---
 
 ## Recent Improvements
 
-Since the initial version on the main branch, the following improvements have been made to enhance the system's functionality and structure:
+Since the initial version on the main branch, the following improvements have been made to enhance the system's functionality and structure 'restrucutre-project-strucutre' has the latest changes:
 
 - **Project Restructure:**
   - The project structure has been modularized, with separate directories and files for configuration, email processing, history tracking, utilities, and more. This makes the codebase easier to maintain and extend.
