@@ -207,9 +207,49 @@ Key choices made throughout development:
 - Containerize for deployment (e.g., Docker) and prepare for REST or webhook endpoints.
 - Track confidence scores, fallback usage, and failure types for model tuning.
 - Plan for user-level customization of prompts or reply style in future versions.
-```
+
 ---
 
+## Recent Improvements
+
+Since the initial version on the main branch, the following improvements have been made to enhance the system's functionality and structure:
+
+- **Project Restructure:**
+  - The project structure has been modularized, with separate directories and files for configuration, email processing, history tracking, utilities, and more. This makes the codebase easier to maintain and extend.
+  - Key improvements are located in `src/`, where core logic like classification and response generation has been moved to dedicated modules.
+
+- **Docker Support:**
+  - Dockerfile added for containerization, enabling easier deployment and development environments. The system can now be built and run inside a Docker container, ensuring consistency across different environments.
+  - Docker-related setup and dependencies have been integrated.
+
+- **Environment Configuration:**
+  - The `.env` file format has been standardized, and environment variables like `OPENAI_API_KEY`, `MODEL_NAME`, and `TEMPERATURE` are now properly handled via `python-dotenv`. This secures sensitive data during development and deployment.
+  
+- **Improved Dependency Management:**
+  - The `requirements.txt` has been replaced with `pyproject.toml` for dependency management, aligning with modern Python packaging standards and improving project compatibility with tools like Poetry.
+
+- **Enhanced Prompt Design:**
+  - The prompts used for classification and response generation have been improved, including clearer persona framing and explicit reasoning steps. 
+  - Category definitions and confidence scoring are now built directly into the prompts to ensure consistent, reliable outputs.
+
+- **Error Handling and Logging:**
+  - Additional error handling has been implemented, specifically for confidence thresholds and malformed outputs.
+  - Logging mechanisms have been refined to track and report errors, making debugging and monitoring easier.
+
+- **Async Support:**
+  - The system has been updated to run asynchronously where necessary, leveraging Python's `asyncio` for non-blocking operations like querying external services or processing multiple emails in parallel. This ensures better performance and responsiveness, especially during batch processing or when handling large datasets.
+
+- **Testing Improvements:**
+  - Test cases for different components have been added and improved using `pytest`. The tests now cover a wider range of edge cases and integrate more seamlessly into the CI/CD pipeline.
+
+- **Batch Processing and RAG (Retrieval-Augmented Generation):**
+  - A batch processing system has been implemented, allowing the processing of multiple emails in one go. This is demonstrated in `scripts/run_batch_demo.py`.
+  - **Retrieval-Augmented Generation (RAG)** has been integrated to enhance the context provided to the model when generating responses. The system fetches relevant context (e.g., previous conversations or specific support documents) to improve the quality and relevance of the generated response. This context is retrieved asynchronously and fed into the model in real-time to assist with generating more personalized and accurate replies.
+
+These improvements are spread across the `src/`, `tests/`, and Docker-related files, and ensure the system is more modular, maintainable, async-capable, and ready for production-scale deployment.
+
+---
+```
 ## Author
 
 Jeffrey Sherer
