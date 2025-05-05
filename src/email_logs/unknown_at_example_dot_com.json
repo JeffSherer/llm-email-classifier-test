@@ -1,0 +1,72 @@
+[
+  {
+    "timestamp": "2025-05-05T00:05:08.099596",
+    "subject": "Question about compatibility",
+    "body": "Hi, is your premium package compatible with macOS Ventura?",
+    "category": "inquiry",
+    "response": "Thank you for reaching out with your question about our premium package. We're happy to clarify that our premium package is indeed compatible with macOS Ventura. If you have any further questions or need assistance, please don't hesitate to let us know. We're here to help."
+  },
+  {
+    "timestamp": "2025-05-05T00:05:11.177363",
+    "subject": "Thanks for the amazing support",
+    "body": "Just wanted to say your support team was incredible in resolving my issue. Give them a raise!",
+    "category": "feedback",
+    "response": "Thank you for your kind words and feedback! We're thrilled to hear that our support team was able to resolve your issue. We will make sure to pass on your appreciation to them. If you have any more questions or need further assistance in the future, feel free to reach out. Thank you for choosing our service!"
+  },
+  {
+    "timestamp": "2025-05-05T00:05:13.940578",
+    "subject": "Installation help needed",
+    "body": "I'm stuck on the installation process and getting error code 5123. Tried restarting but no luck.",
+    "category": "support_request",
+    "response": "Thank you for reaching out about the installation issue you're facing with error code 5123. We understand how frustrating it can be when things don't go smoothly. Our team is currently investigating the issue and will provide you with a solution as soon as possible. We appreciate your patience and apologize for any inconvenience this has caused."
+  },
+  {
+    "timestamp": "2025-05-05T00:05:16.697688",
+    "subject": "Partnership opportunity",
+    "body": "We\u2019d like to explore a strategic partnership. Are you available for a call next week?",
+    "category": "inquiry",
+    "response": "Thank you for reaching out with a partnership opportunity. We are excited to explore this possibility further. Please let us know your availability for a call next week so we can discuss this in more detail. Looking forward to connecting with you!"
+  },
+  {
+    "timestamp": "2025-05-05T00:05:19.054841",
+    "subject": "Broken product received",
+    "body": "I received my order #12345 yesterday but it arrived completely damaged. This is unacceptable and I demand a refund immediately.",
+    "category": "complaint",
+    "response": "Dear unknown@example.com,\n\nWe sincerely apologize for the inconvenience caused by the damaged product you received. Your satisfaction is our top priority, and we understand your frustration. We will expedite the refund process for order #12345 immediately. Please allow us some time to process this request, and we will ensure that you are promptly refunded.\n\nThank you for bringing this to our attention, and we appreciate your understanding.\n\nBest regards,\n[Your Name]\nCustomer Service Team"
+  },
+  {
+    "timestamp": "2025-05-05T00:45:47.530008",
+    "subject": "Question about compatibility",
+    "body": "Hi, is your premium package compatible with macOS Ventura?",
+    "category": "inquiry",
+    "response": "Thank you for your question. Our premium package is compatible with macOS Ventura. Feel free to reach out if you have any further inquiries or need assistance."
+  },
+  {
+    "timestamp": "2025-05-05T00:45:50.192397",
+    "subject": "Thanks for the amazing support",
+    "body": "Just wanted to say your support team was incredible in resolving my issue. Give them a raise!",
+    "category": "feedback",
+    "response": "Thank you for your kind words! We are thrilled to hear that our support team was able to assist you effectively. Your feedback has been shared with the team, and we appreciate you taking the time to acknowledge their hard work. If you have any more questions or need further assistance in the future, please don't hesitate to reach out. Thank you for choosing our services!"
+  },
+  {
+    "timestamp": "2025-05-05T00:45:52.853324",
+    "subject": "Installation help needed",
+    "body": "I'm stuck on the installation process and getting error code 5123. Tried restarting but no luck.",
+    "category": "support_request",
+    "response": "Thank you for reaching out for assistance with the installation process. We apologize for the inconvenience you are facing with error code 5123. Our team is currently looking into this issue and will provide you with a solution as soon as possible. In the meantime, please try the troubleshooting steps provided on our website. Thank you for your patience."
+  },
+  {
+    "timestamp": "2025-05-05T00:45:54.800515",
+    "subject": "Partnership opportunity",
+    "body": "We\u2019d like to explore a strategic partnership. Are you available for a call next week?",
+    "category": "inquiry",
+    "response": "Thank you for reaching out with a partnership opportunity. We appreciate your interest in collaborating with us. We are available for a call next week to discuss this further. Please let us know your preferred date and time, and we will coordinate accordingly. Looking forward to the potential partnership!"
+  },
+  {
+    "timestamp": "2025-05-05T00:45:58.033005",
+    "subject": "Broken product received",
+    "body": "I received my order #12345 yesterday but it arrived completely damaged. This is unacceptable and I demand a refund immediately.",
+    "category": "complaint",
+    "response": "Dear unknown@example.com,\n\nWe sincerely apologize for the inconvenience caused by the damaged product you received. Your satisfaction is important to us, and we understand your frustration. We will process a refund for order #12345 immediately. Please expect an email confirmation shortly.\n\nThank you for bringing this to our attention, and we appreciate your understanding.\n\nBest regards,\nCustomer Service Team"
+  }
+]

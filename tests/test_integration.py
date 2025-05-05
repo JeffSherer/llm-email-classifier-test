@@ -2,7 +2,9 @@ import pytest
 from unittest.mock import patch
 from src.email_processor import EmailProcessor
 
-def mocked_safe_chat_completion(client, messages, temperature=0, model="gpt-3.5-turbo-0125"):
+
+# Mocked function for async call
+async def mocked_safe_chat_completion(messages, temperature=0, model="gpt-3.5-turbo-0125"):
     prompt = messages[0]["content"]
 
     # Detect classification prompt
@@ -28,12 +30,12 @@ def mocked_safe_chat_completion(client, messages, temperature=0, model="gpt-3.5-
 
     return None
 
-
 @pytest.fixture(autouse=True)
 def mock_openai_api_key(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "mocked-api-key")
 
-def test_email_processing():
+@pytest.mark.asyncio  # Mark the tests as async
+async def test_email_processing():
     email = {
         "id": "001",
         "subject": "Inquiry about product",
@@ -43,15 +45,36 @@ def test_email_processing():
 
     processor = EmailProcessor()
 
-    with patch("src.email_processor.safe_chat_completion", side_effect=mocked_safe_chat_completion):
-        classification = processor.classify_email(email)
+    with patch("src.openai_helper.async_safe_chat_completion", side_effect=mocked_safe_chat_completion):
+        classification = await processor.classify_email(email)  # Await the async method
         assert classification == "inquiry", f"Expected 'inquiry', got {classification}"
 
-        response = processor.generate_response(email, classification)
+        response = await processor.generate_response(email, classification)  # Await the async method
         assert response
         assert "thank you" in response.lower()
 
-def test_valid_email_processing():
+@pytest.mark.asyncio  # Mark the tests as async
+async def test_email_processing():
+    email = {
+        "id": "001",
+        "subject": "Inquiry about product",
+        "body": "I am interested in learning more about your product.",
+        "from_": "user@example.com"
+    }
+
+    processor = EmailProcessor()
+
+    # Correct the patch to use the correct module name (openai_helpers)
+    with patch("src.openai_helpers.async_safe_chat_completion", side_effect=mocked_safe_chat_completion):
+        classification = await processor.classify_email(email)  # Await the async method
+        assert classification == "inquiry", f"Expected 'inquiry', got {classification}"
+
+        response = await processor.generate_response(email, classification)  # Await the async method
+        assert response
+        assert "thank you" in response.lower()
+
+@pytest.mark.asyncio  # Mark the tests as async
+async def test_valid_email_processing():
     email = {
         "id": "002",
         "subject": "Feedback on product",
@@ -61,15 +84,17 @@ def test_valid_email_processing():
 
     processor = EmailProcessor()
 
-    with patch("src.email_processor.safe_chat_completion", side_effect=mocked_safe_chat_completion):
-        classification = processor.classify_email(email)
+    # Correct the patch to use the correct module name (openai_helpers)
+    with patch("src.openai_helpers.async_safe_chat_completion", side_effect=mocked_safe_chat_completion):
+        classification = await processor.classify_email(email)  # Await the async method
         assert classification == "feedback", f"Expected 'feedback', got {classification}"
 
-        response = processor.generate_response(email, classification)
+        response = await processor.generate_response(email, classification)  # Await the async method
         assert response
         assert "thank you" in response.lower()
 
-def test_invalid_email_format():
+@pytest.mark.asyncio  # Mark the tests as async
+async def test_invalid_email_format():
     email = {
         "id": "003",
         "subject": "Invalid email",
@@ -79,9 +104,10 @@ def test_invalid_email_format():
 
     processor = EmailProcessor()
 
-    with patch("src.email_processor.safe_chat_completion", side_effect=mocked_safe_chat_completion):
-        classification = processor.classify_email(email)
+    # Correct the patch to use the correct module name (openai_helpers)
+    with patch("src.openai_helpers.async_safe_chat_completion", side_effect=mocked_safe_chat_completion):
+        classification = await processor.classify_email(email)  # Await the async method
         assert classification is None
 
-        response = processor.generate_response(email, "complaint")
+        response = await processor.generate_response(email, "complaint")  # Await the async method
         assert response is None

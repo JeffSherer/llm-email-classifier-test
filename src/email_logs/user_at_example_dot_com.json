@@ -1,0 +1,51 @@
+[
+  {
+    "timestamp": "2025-05-04T20:08:17.189280",
+    "subject": "Inquiry about product",
+    "body": "I am interested in learning more about your product.",
+    "category": "inquiry",
+    "response": "Thank you for your message. We appreciate your feedback and will get back to you shortly."
+  },
+  {
+    "timestamp": "2025-05-04T20:09:21.949995",
+    "subject": "Inquiry about product",
+    "body": "I am interested in learning more about your product.",
+    "category": "inquiry",
+    "response": "Thank you for your message. We appreciate your feedback and will get back to you shortly."
+  },
+  {
+    "timestamp": "2025-05-04T20:10:29.354908",
+    "subject": "Inquiry about product",
+    "body": "I am interested in learning more about your product.",
+    "category": "inquiry",
+    "response": "Thank you for your message. We appreciate your feedback and will get back to you shortly."
+  },
+  {
+    "timestamp": "2025-05-04T20:17:24.498023",
+    "subject": "Inquiry about product",
+    "body": "I am interested in learning more about your product.",
+    "category": "inquiry",
+    "response": "Thank you for your message. We appreciate your feedback and will get back to you shortly."
+  },
+  {
+    "timestamp": "2025-05-05T02:10:22.556716",
+    "subject": "Inquiry about product",
+    "body": "I am interested in learning more about your product.",
+    "category": "inquiry",
+    "response": "Thank you for your message. We appreciate your feedback and will get back to you shortly."
+  },
+  {
+    "timestamp": "2025-05-05T02:12:16.012683",
+    "subject": "Inquiry about product",
+    "body": "I am interested in learning more about your product.",
+    "category": "inquiry",
+    "response": "Thank you for your message. We appreciate your feedback and will get back to you shortly."
+  },
+  {
+    "timestamp": "2025-05-05T02:17:34.266991",
+    "subject": "Inquiry about product",
+    "body": "I am interested in learning more about your product.",
+    "category": "inquiry",
+    "response": "Thank you for reaching out with your interest in our product. We are happy to provide you with more information to help you make an informed decision. Please let us know any specific details you would like to know, and we will be glad to assist you."
+  }
+]

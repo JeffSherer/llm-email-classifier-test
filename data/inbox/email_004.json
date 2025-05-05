@@ -1,0 +1,7 @@
+{
+  "id": "004",
+  "from": "tech.user@example.com",
+  "subject": "Installation help needed",
+  "body": "I'm stuck on the installation process and getting error code 5123. Tried restarting but no luck.",
+  "timestamp": "2024-05-04T12:00:00Z"
+}

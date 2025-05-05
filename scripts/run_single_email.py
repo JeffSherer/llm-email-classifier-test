@@ -26,9 +26,13 @@ def main():
 
     processor = EmailProcessor()
     category = processor.classify_email(email)
+    confidence = processor.last_confidence
+
     if not category:
         print("[FAIL] Classification failed.")
         sys.exit(1)
+
+    print(f"[INFO] Classified as: {category} (confidence: {confidence}/5)")
 
     response = processor.generate_response(email, category)
     if response:

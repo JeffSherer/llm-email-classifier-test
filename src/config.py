@@ -1,17 +1,11 @@
-# src/demo_email_run.py
+# src/config.py
+import os
+from dotenv import load_dotenv
 
-from src.email_processor import EmailProcessor
+load_dotenv()  # Load environment variables from .env file
 
-email = {
-    "id": "demo001",
-    "subject": "Question about pricing plans",
-    "body": "Hi, can you explain the different pricing options you offer?",
-    "from_": "returning_user@example.com",
-}
-
-processor = EmailProcessor()
-classification = processor.classify_email(email)
-response = processor.generate_response(email, classification)
-
-print("\n=== Final Response ===")
-print(response)
+# Configuration settings
+API_KEY = os.getenv("OPENAI_API_KEY", "your-default-api-key-here")
+MODEL_NAME = os.getenv("MODEL_NAME", "gpt-3.5-turbo")  # Default model if not set
+TEMPERATURE = float(os.getenv("TEMPERATURE", 0.7))  # Default temperature if not set
+MAX_TOKENS = int(os.getenv("MAX_TOKENS", 1500))  # Default token limit if not set

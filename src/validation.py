@@ -1,5 +1,3 @@
-# src/validation.py
-
 import logging
 from pydantic import BaseModel, EmailStr, ValidationError
 from typing import Optional, Dict
@@ -12,9 +10,9 @@ class EmailInput(BaseModel):
     body: str
     from_: Optional[EmailStr] = "unknown@example.com"
 
-def validate_email_data(email_data: Dict) -> Optional[EmailInput]:
+async def validate_email_data(email_data: Dict) -> Optional[EmailInput]:
     try:
         return EmailInput(**email_data)
     except ValidationError as e:
-        logger.error(f"Validation failed for incoming email data: {e}")
+        logger.error(f"Validation failed for incoming email data: {e}\nInvalid data: {email_data}")
         return None

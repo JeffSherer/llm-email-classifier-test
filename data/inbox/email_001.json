@@ -1,0 +1,7 @@
+{
+  "id": "001",
+  "from": "angry.customer@example.com",
+  "subject": "Broken product received",
+  "body": "I received my order #12345 yesterday but it arrived completely damaged. This is unacceptable and I demand a refund immediately.",
+  "timestamp": "2024-05-04T09:00:00Z"
+}
