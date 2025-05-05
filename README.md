@@ -2,8 +2,6 @@
 
 This project implements an intelligent, automated pipeline for classifying customer emails and generating responses using OpenAI's GPT-3.5, with support for context-aware (RAG-based) replies and per-user memory. It is structured for modularity, extensibility, and real-world production readiness.
 
----
-
 ## Project Features
 
 - **LLM-based Email Classification**
@@ -14,8 +12,6 @@ This project implements an intelligent, automated pipeline for classifying custo
 - **Confidence Thresholds and Error Recovery**
 - **Mock Service Integrations for Action Simulation (e.g., ticketing)**
 
----
-
 ## Project Structure
 
 ```
@@ -24,9 +20,6 @@ llm-email-classifier-test/
 │   ├── inbox/                    # JSON files with incoming emails (for batch demo)
 │   └── response_examples/        # Category-specific RAG reference files (txt)
 ├── logs/                        # Logs for cost and processing
-├── scripts/
-│   ├── run_single_email.py      # CLI script for single email classification and response
-│   └── run_batch_demo.py        # Batch processing demonstration (reads inbox/)
 ├── src/
 │   ├── __init__.py              # Package initializer
 │   ├── config.py                # Configuration handling
@@ -43,12 +36,9 @@ llm-email-classifier-test/
 ├── tests/                       # Add test cases here
 ├── .env                         # Your OpenAI API key
 ├── pyproject.toml               # Python packaging config
-├── requirements.txt             # Direct dependencies
 ├── setup.py                     # Editable install support
 └── README.md                    # This file
 ```
-
----
 
 ## Setup Instructions
 
@@ -64,7 +54,7 @@ cd llm-email-classifier-test
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -r pyproject.toml
 ```
 
 ### 3. Set OpenAI Key
@@ -81,14 +71,12 @@ OPENAI_API_KEY=your_key_here
 pip install -e .
 ```
 
----
-
 ## Running the System
 
 ### Run Single Email
 
 ```bash
-python scripts/run_single_email.py data/inbox/email_001.json
+python src/scripts/run_single_email.py data/inbox/email_001.json
 ```
 
 ### Run Batch Email Processing
@@ -96,10 +84,8 @@ python scripts/run_single_email.py data/inbox/email_001.json
 This will process all `.json` emails in `data/inbox/`:
 
 ```bash
-python -m scripts.run_batch_demo
+python -m src.scripts.run_batch_demo
 ```
-
----
 
 ## Inbox File Format
 
@@ -115,8 +101,6 @@ Each email should be a `.json` file in `data/inbox/`:
 }
 ```
 
----
-
 ## RAG Reference Files
 
 Located in `data/response_examples/`. These `.txt` files store sample replies per category to improve context grounding for the LLM:
@@ -126,8 +110,6 @@ Located in `data/response_examples/`. These `.txt` files store sample replies pe
 * `feedback.txt`
 * `support_request.txt`
 * `other.txt`
-
----
 
 ## Developer Notes
 
@@ -140,26 +122,20 @@ Located in `data/response_examples/`. These `.txt` files store sample replies pe
   * `response_handlers` in `EmailAutomationSystem`
   * Add `.txt` context files in `data/response_examples/`
 
----
-
 ## Sample Run Output
 
-After running `python -m scripts.run_batch_demo`, you'll see:
+After running `python -m src.scripts.run_batch_demo`, you'll see:
 
 * Classification category
 * Confidence score
 * Response preview
 * Logs showing RAG, reasoning, and mock service actions
 
----
-
 ## Testing and Logging
 
 * Integration tests can be placed in `tests/`
 * Cost tracking logs are saved to `logs/costs.log`
 * Email processing logs show in console and `src/email_logs/`
-
----
 
 ## Notes
 
