@@ -4,7 +4,7 @@ import os
 import sys
 import json
 from typing import Optional
-from src.email_processor import EmailProcessor
+from src.email_processing.email_processor import EmailProcessor
 
 def load_json(path: str) -> Optional[dict]:
     try:

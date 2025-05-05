@@ -4,7 +4,7 @@ from src.config import API_KEY, MODEL_NAME, TEMPERATURE
 from src.helpers.openai_helpers import async_safe_chat_completion
 from src.helpers.validation import validate_email_data
 from src.helpers.prompting import build_classification_prompt, build_response_prompt
-from src.email_history import fetch_history, append_to_history
+from src.email_processing.email_history import fetch_history, append_to_history
 from src.models.rag_retriever import get_relevant_context
 from src.utils.response_loader import get_random_response
 

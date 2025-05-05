@@ -15,7 +15,7 @@ docs = [
 embeddings = OpenAIEmbeddings()
 
 # Create and persist Chroma index
-vectorstore = Chroma.from_documents(docs, embedding=embeddings, persist_directory="chroma_index")
+vectorstore = Chroma.from_documents(docs, embedding=embeddings, persist_directory="data/chroma_index")
 vectorstore.persist()
 
-print("✅ Chroma index built and saved to 'chroma_index'")
+print("✅ Chroma index built and saved to 'data/chroma_index'")

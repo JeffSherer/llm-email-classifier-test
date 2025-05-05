@@ -2,10 +2,11 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from .env file
+# Load environment variables from the .env file
+load_dotenv()
 
-# Configuration settings
-API_KEY = os.getenv("OPENAI_API_KEY", "your-default-api-key-here")
-MODEL_NAME = os.getenv("MODEL_NAME", "gpt-3.5-turbo")  # Default model if not set
-TEMPERATURE = float(os.getenv("TEMPERATURE", 0.7))  # Default temperature if not set
-MAX_TOKENS = int(os.getenv("MAX_TOKENS", 1500))  # Default token limit if not set
+# Access the environment variables
+API_KEY = os.getenv("OPENAI_API_KEY")
+MODEL_NAME = os.getenv("MODEL_NAME")
+TEMPERATURE = float(os.getenv("TEMPERATURE", 0.7))  # Default to 0.7 if not set
+MAX_TOKENS = int(os.getenv("MAX_TOKENS", 1500))  # Default to 1500 if not set

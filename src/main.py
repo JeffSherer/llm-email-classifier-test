@@ -1,5 +1,5 @@
-from src.email_automation import EmailAutomationSystem
-from src.email_processor import EmailProcessor
+from src.email_processing.email_automation import EmailAutomationSystem
+from src.email_processing.email_processor import EmailProcessor
 from src.sample_emails import sample_emails
 
 import pandas as pd

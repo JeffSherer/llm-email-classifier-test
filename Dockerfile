@@ -7,4 +7,4 @@ COPY . /app
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "scripts/run_single_email.py", "sample_email.json"]
+CMD ["python", "src/scripts/run_single_email.py", "data/inbox/email_001.json"]

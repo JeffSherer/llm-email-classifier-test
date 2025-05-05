@@ -6,8 +6,8 @@ import pandas as pd
 import logging
 import asyncio
 
-from src.email_processor import EmailProcessor
-from src.email_automation import EmailAutomationSystem
+from src.email_processing.email_processor import EmailProcessor
+from src.email_processing.email_automation import EmailAutomationSystem
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

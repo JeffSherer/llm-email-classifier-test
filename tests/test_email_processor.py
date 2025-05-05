@@ -1,5 +1,5 @@
 import pytest
-from src.email_processor import EmailProcessor
+from src.email_processing.email_processor import EmailProcessor
 from unittest.mock import patch
 
 # Define the mocked version of async_safe_chat_completion
@@ -53,7 +53,7 @@ async def test_generate_response(processor):
     }
 
     # Patch the async_safe_chat_completion function in the correct location
-    with patch("src.openai_helpers.async_safe_chat_completion", side_effect=mocked_safe_chat_completion): 
+    with patch("src.helpers.openai_helpers.async_safe_chat_completion", side_effect=mocked_safe_chat_completion): 
         category = await processor.classify_email(email)  # Await the async method
         response = await processor.generate_response(email, category)  # Await the async method
         assert response
