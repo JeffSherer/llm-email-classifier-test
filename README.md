@@ -17,27 +17,28 @@ This project implements an intelligent, automated pipeline for classifying custo
 ```
 llm-email-classifier-test/
 ├── data/
-│   ├── inbox/                    # JSON files with incoming emails (for batch demo)
-│   └── response_examples/        # Category-specific RAG reference files (txt)
-├── logs/                        # Logs for cost and processing
+│   ├── inbox/                    
+│   └── response_examples/        
+├── logs/    
+├── scripts/                    
 ├── src/
-│   ├── __init__.py              # Package initializer
-│   ├── config.py                # Configuration handling
-│   ├── email_processor.py       # LLM classification and response generation logic
-│   ├── email_automation.py      # Action handlers based on classification
-│   ├── mock_services.py         # Mocked integrations for tickets, logging, etc.
-│   ├── email_history.py         # Tracks and logs prior interactions by user
-│   ├── user_profile.py          # Optional user-specific metadata (extensible)
-│   ├── prompting.py             # Centralized prompt construction for LLM
-│   ├── rag_retriever.py         # Loads example-based context for RAG
-│   ├── sample_emails.py         # Example emails used in the demo
-│   ├── validation.py            # Input validation helpers
-│   └── utils/                   # Miscellaneous helpers/utilities
-├── tests/                       # Add test cases here
-├── .env                         # Your OpenAI API key
-├── pyproject.toml               # Python packaging config
-├── setup.py                     # Editable install support
-└── README.md                    # This file
+│   ├── __init__.py             
+│   ├── config.py              
+│   ├── email_processor.py       
+│   ├── email_automation.py      
+│   ├── mock_services.py        
+│   ├── email_history.py         
+│   ├── user_profile.py          
+│   ├── prompting.py             
+│   ├── rag_retriever.py        
+│   ├── sample_emails.py         
+│   ├── validation.py            
+│   └── utils/                  
+├── tests/                     
+├── .env                       
+├── pyproject.toml               
+├── setup.py                    
+└── README.md                    
 ```
 
 ## Setup Instructions
@@ -76,7 +77,8 @@ pip install -e .
 ### Run Single Email
 
 ```bash
-python src/scripts/run_single_email.py data/inbox/email_001.json
+python python scripts/run_single_email.py data/inbox/email_001.json
+
 ```
 
 ### Run Batch Email Processing
@@ -84,7 +86,7 @@ python src/scripts/run_single_email.py data/inbox/email_001.json
 This will process all `.json` emails in `data/inbox/`:
 
 ```bash
-python -m src.scripts.run_batch_demo
+python -m scripts.run_batch_demo
 ```
 
 ## Inbox File Format
@@ -124,7 +126,7 @@ Located in `data/response_examples/`. These `.txt` files store sample replies pe
 
 ## Sample Run Output
 
-After running `python -m src.scripts.run_batch_demo`, you'll see:
+After running `python -m scripts.run_batch_demo`, you'll see:
 
 * Classification category
 * Confidence score

@@ -5,5 +5,12 @@
     "body": "Something\u2019s broken. Can you fix it?",
     "category": "support_request",
     "response": "Thank you for reaching out about the issue with your account. We understand how frustrating it can be when things aren't working as they should. Rest assured, our team is looking into this and will provide you with a solution as soon as possible. Thank you for your patience."
+  },
+  {
+    "timestamp": "2025-05-05T04:29:58.236578",
+    "subject": "Need help with my account",
+    "body": "Something\u2019s broken. Can you fix it?",
+    "category": "support_request",
+    "response": "Thank you for reporting this issue with your account. We understand how frustrating it can be when something isn't working properly. Rest assured, our team is looking into this and will provide you with a solution as soon as possible. Thank you for your patience."
   }
 ]

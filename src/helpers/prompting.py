@@ -1,6 +1,6 @@
 # src/prompting.py
 
-from src.data.data import CATEGORY_DEFINITIONS, SAMPLE_RESPONSES
+from data.data import CATEGORY_DEFINITIONS, SAMPLE_RESPONSES
 
 
 def build_classification_prompt(subject: str, body: str) -> str:

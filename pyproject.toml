@@ -118,7 +118,7 @@ dependencies = [
     "zlib==1.2.13",
     "zstandard==0.23.0"
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<4"
 
 [tool.setuptools.packages.find]
 where = ["src"]

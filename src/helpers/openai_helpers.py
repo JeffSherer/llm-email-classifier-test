@@ -4,7 +4,7 @@ import time
 import logging
 import os
 import asyncio
-from src.config import API_KEY, MODEL_NAME, TEMPERATURE  # Import configuration
+from config import API_KEY, MODEL_NAME, TEMPERATURE  # Import configuration
 
 logger = logging.getLogger(__name__)
 

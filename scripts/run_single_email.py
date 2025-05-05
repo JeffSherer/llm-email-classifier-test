@@ -1,10 +1,9 @@
-# run.py
-
 import os
 import sys
 import json
+import asyncio
 from typing import Optional
-from src.email_processing.email_processor import EmailProcessor
+from email_processing.email_processor import EmailProcessor
 
 def load_json(path: str) -> Optional[dict]:
     try:
@@ -14,7 +13,7 @@ def load_json(path: str) -> Optional[dict]:
         print(f"[ERROR] Failed to read file {path}: {e}")
         return None
 
-def main():
+async def main():
     if len(sys.argv) < 2:
         print("Usage: python run.py <email.json>")
         sys.exit(1)
@@ -25,7 +24,9 @@ def main():
         sys.exit(1)
 
     processor = EmailProcessor()
-    category = processor.classify_email(email)
+    
+    # Assuming classify_email is an async function
+    category = await processor.classify_email(email)
     confidence = processor.last_confidence
 
     if not category:
@@ -34,7 +35,8 @@ def main():
 
     print(f"[INFO] Classified as: {category} (confidence: {confidence}/5)")
 
-    response = processor.generate_response(email, category)
+    # Await the generate_response function
+    response = await processor.generate_response(email, category)
     if response:
         print("\n=== Generated Response ===\n")
         print(response)
@@ -43,4 +45,4 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

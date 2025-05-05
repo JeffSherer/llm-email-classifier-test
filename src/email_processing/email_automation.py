@@ -1,13 +1,13 @@
 import logging
 from typing import Dict
-from src.mock_services import (
+from helpers.mock_services import (
     create_urgent_ticket,
     create_support_ticket,
     log_customer_feedback,
     send_complaint_response,
     send_standard_response,
 )
-from src.email_processor import EmailProcessor
+from email_processor import EmailProcessor
 
 logger = logging.getLogger(__name__)
 
